@@ -1,1 +1,1 @@
-export PATH="$PATH:/Users/adaau/flutter/bin"
+export PATH="$PATH:[your_path_to_flutter]/flutter/bin"
