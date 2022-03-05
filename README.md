@@ -4,4 +4,4 @@ A Flutter project for a joystick controller.
 
 ## Getting Started
 
-Add flutter to your path, then `flutter run` to start.
+Add flutter to your path, then use `flutter run` to start.
