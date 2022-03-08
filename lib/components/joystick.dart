@@ -39,7 +39,9 @@ class _JoystickState extends State<Joystick> {
         Offset offset = details.localPosition - center;
         double angle = atan2(offset.dy, offset.dx);
         double distance = min(
-            widget.padSize / 2, sqrt((pow(offset.dy, 2) + pow(offset.dx, 2))));
+            widget.padSize / 2,
+            sqrt((pow(offset.dy, 2) +
+                pow(offset.dx, 2)))); //avoid distance over 1
 
         setState(() {
           position = Offset(
