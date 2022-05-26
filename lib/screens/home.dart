@@ -23,12 +23,16 @@ class _HomeState extends State<Home> {
 
   late BluetoothDevice targetDevice;
   late BluetoothCharacteristic targetCharacteristic;
+  int isDancing = 0;
+  int isRotating = 0;
+  int isBalancing = 0;
+  int isBarking = 0;
   int power = 0;
   int turnVal = 0;
   Offset position = Offset(0, 0);
   String connectionText = "";
   String output =
-      "x0y0p0t0"; // protocol for transmiting x,y,power,turnVal values
+      "*x20y20e1111"; // protocol for transmiting x,y,isDancing, isRotating, isBalancing, haven't defined yet
   void initState() {
     super.initState();
     startScan();
@@ -112,24 +116,33 @@ class _HomeState extends State<Home> {
     await targetCharacteristic.write(bytes);
   }
 
-  String createCmd(Offset value, int power, int turnVal) {
+  String createCmd(Offset value) {
     int x = (value.dx * 10).toInt() + 10; // range from 20 to 0 now
     int y = (value.dy * 10).toInt() + 10;
-    String cmd = "x" +
+    // String cmd = "x" +
+    //     x.toString() +
+    //     "y" +
+    //     y.toString() +
+    //     "p" +
+    //     power.toString() +
+    //     "t" +
+    //     turnVal.toString();
+    String cmd = "*x" +
         x.toString() +
         "y" +
         y.toString() +
-        "p" +
-        power.toString() +
-        "t" +
-        turnVal.toString();
+        "e" +
+        isDancing.toString() +
+        isRotating.toString() +
+        isBalancing.toString() +
+        isBarking.toString();
     return cmd;
   }
 
   void handleChange(Offset value) {
-    print(value.toString());
+    //print(value.toString());
     position = value;
-    String cmd = createCmd(position, power, turnVal);
+    String cmd = createCmd(position);
     writeData(cmd);
     position = Offset(0, 0);
   }
@@ -137,24 +150,16 @@ class _HomeState extends State<Home> {
   void buttonListner(int index) {
     switch (index) {
       case 0:
-        if (turnVal >= 0) {
-          turnVal--;
-        }
+        isDancing = isDancing == 0 ? 1 : 0; //toggle 1 and 0
         break;
       case 1:
-        if (power > 0) {
-          power--;
-        }
+        isRotating = isRotating == 0 ? 1 : 0;
         break;
       case 2:
-        if (turnVal < 9) {
-          turnVal++;
-        }
+        isBalancing = isBalancing == 0 ? 1 : 0;
         break;
       case 3:
-        if (power < 9) {
-          power++;
-        }
+        isBarking = isBarking == 0 ? 1 : 0;
         break;
       default:
     }
@@ -164,7 +169,7 @@ class _HomeState extends State<Home> {
       int buttonIndex, Gestures gesture) {
     String data = "buttonIndex : ${buttonIndex}";
     buttonListner(buttonIndex);
-    String cmd = createCmd(position, power, turnVal);
+    String cmd = createCmd(position);
     writeData(cmd);
     throw '';
   }
@@ -173,9 +178,13 @@ class _HomeState extends State<Home> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const Text('Control Pad Example'),
+          title: const Text('Doggie Controller'),
         ),
         body: Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+                image: AssetImage("lib/images/image1.jpg"), fit: BoxFit.cover),
+          ),
           child: !connectionText.contains("All Ready with")
               ? Center(
                   child: Text(
